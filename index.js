@@ -90,13 +90,13 @@ async function run() {
             res.send(result)
         })
 
-        // //-------------------add Craft------------------------------------------
-        // app.post('/allCraft', async (req, res) => {
-        //     const newCraft = req.body
-        //     // console.log(newJob)
-        //     const result = await HistoCollection.insertOne(newCraft)
-        //     res.send(result)
-        // })
+        //-------------------add Craft------------------------------------------
+        app.post('/allCraft', async (req, res) => {
+            const newCraft = req.body
+            // console.log(newCraft)
+            const result = await HistoCollection.insertOne(newCraft)
+            res.send(result)
+        })
 
         // //---------------------------Get craft by ID-----------------------------
         // app.get('/allCraft/:id', async (req, res) => {
