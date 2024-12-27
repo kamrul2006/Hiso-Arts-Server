@@ -57,7 +57,7 @@ async function run() {
 
         // ---------------creating DATA BASE ON MONGO DB----------------------
         const HistoCollection = client.db("CraftDB").collection('All-Crafts')
-        // const ApplyCollection = client.db("JobDB").collection('All-Apply')
+        const LikedCollection = client.db("LikedDB").collection('All-Liked')
 
         // ---auth related Apis-------------------------------
         app.post('/jwt', async (req, res) => {
@@ -115,41 +115,41 @@ async function run() {
 
 
 
-        // //-------------------add Apply-----------------------------------------
-        // app.post('/apply', async (req, res) => {
-        //     const newApply = req.body
-        //     //  console.log(newVisa)
-        //     const result = await ApplyCollection.insertOne(newApply)
+        //-------------------add liked-----------------------------------------
+        app.post('/liked', async (req, res) => {
+            const newLiked = req.body
+            //  console.log(newVisa)
+            const result = await LikedCollection.insertOne(newLiked)
 
-        //     //-not the best way to get the application count
-        //     const id = newApply.job_id
-        //     const query = { _id: new ObjectId(id) }
-        //     const job = await HistoCollection.findOne(query)
+            //-not the best way to get the application count
+            const id = newLiked.job_id
+            const query = { _id: new ObjectId(id) }
+            const likee = await HistoCollection.findOne(query)
 
-        //     console.log(job)
+            console.log(job)
 
-        //     let jobCount = 0
+            let likeCount = 0
 
-        //     if (job.applyCount) {
-        //         jobCount = job.applyCount + 1
-        //     }
-        //     else {
-        //         jobCount = 1
-        //     }
+            if (likee.applyCount) {
+                likeCount = likee.Like + 1
+            }
+            else {
+                likeCount = 1
+            }
 
-        //     //---updating the job count
-        //     const filter = { _id: new ObjectId(id) }
-        //     const updatedDoc = {
-        //         $set: {
-        //             applyCount: jobCount
-        //         }
-        //     }
+            //---updating the like count
+            const filter = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    Like: likeCount
+                }
+            }
 
-        //     const updatedResult = await HistoCollection.updateOne(filter, updatedDoc)
+            const updatedResult = await HistoCollection.updateOne(filter, updatedDoc)
 
-        //     res.send(result)
+            res.send(result)
 
-        // })
+        })
 
 
         // //---------------------------Showing all Apply------------------------
@@ -164,7 +164,7 @@ async function run() {
         //         return res.status(403).send({ massage: "forbidden" })
         //     }
 
-        //     const cursor = await ApplyCollection.find(query).toArray()
+        //     const cursor = await LikedCollection.find(query).toArray()
         //     // const result = cursor
         //     // console.log(cursor)
         //     res.send(cursor)
@@ -175,7 +175,7 @@ async function run() {
         //     const id = req.params.id
         //     //  console.log(id)
         //     const query = { _id: new ObjectId(id) }
-        //     const result = await ApplyCollection.findOne(query)
+        //     const result = await LikedCollection.findOne(query)
         //     res.send(result)
         // })
 
@@ -184,7 +184,7 @@ async function run() {
         //     const id = req.params.job_id
         //     //  console.log(id)
         //     const query = { job_id: id }
-        //     const result = await ApplyCollection.find(query).toArray()
+        //     const result = await LikedCollection.find(query).toArray()
         //     res.send(result)
         // })
 
@@ -199,7 +199,7 @@ async function run() {
         //             status: data
         //         }
         //     }
-        //     const result = await ApplyCollection.updateOne(query, updatedDoc)
+        //     const result = await LikedCollection.updateOne(query, updatedDoc)
         //     res.send(result)
         // })
 
