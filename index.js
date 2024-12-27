@@ -17,29 +17,29 @@ app.use(express.json());
 app.use(cookieParser());
 
 // // ------------------------------------------
-// const logger = (req, res, next) => {
-//     console.log('inside the logger')
-//     next()
-// }
+const logger = (req, res, next) => {
+    console.log('inside the logger')
+    next()
+}
 
-// const tokenVerify = (req, res, next) => {
-//     const token = req?.cookies?.token
-//     console.log('inside the tokenVerify part', token)
+const tokenVerify = (req, res, next) => {
+    const token = req?.cookies?.token
+    console.log('inside the tokenVerify part', token)
 
-//     if (!token) {
-//         return res.status(401).send({ massage: "Unauthorized access" })
-//     }
+    if (!token) {
+        return res.status(401).send({ massage: "Unauthorized access" })
+    }
 
-//     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-//         if (err) {
-//             console.error('JWT Verification Error:', err.message);
-//             return res.status(403).send({ message: "Forbidden: Invalid or Expired Token" });
-//         }
-//         req.user = decoded;
-//         next();
-//     });
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            console.error('JWT Verification Error:', err.message);
+            return res.status(403).send({ message: "Forbidden: Invalid or Expired Token" });
+        }
+        req.user = decoded;
+        next();
+    });
 
-// }
+}
 
 // ----------------connecting MONGO db---------------------------
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.8jqou.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -98,14 +98,14 @@ async function run() {
             res.send(result)
         })
 
-        // //---------------------------Get craft by ID-----------------------------
-        // app.get('/allCraft/:id', async (req, res) => {
-        //     const id = req.params.id
-        //     // console.log(id)
-        //     const query = { _id: new ObjectId(id) }
-        //     const result = await HistoCollection.findOne(query)
-        //     res.send(result)
-        // })
+        //---------------------------Get craft by ID-----------------------------
+        app.get('/allCraft/:id', async (req, res) => {
+            const id = req.params.id
+            // console.log(id)
+            const query = { _id: new ObjectId(id) }
+            const result = await HistoCollection.findOne(query)
+            res.send(result)
+        })
 
 
 
@@ -150,6 +150,7 @@ async function run() {
         //     res.send(result)
 
         // })
+
 
         // //---------------------------Showing all Apply------------------------
         // app.get('/apply', tokenVerify, async (req, res) => {
