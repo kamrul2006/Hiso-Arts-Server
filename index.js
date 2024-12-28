@@ -136,9 +136,9 @@ async function run() {
                     adderInfo: {
                         name: updatedCraft.adderInfo.name,
                         email: updatedCraft.adderInfo.email
-                      },
-                      discoveredBy: updatedCraft.discoveredBy,
-                      Like: updatedCraft.Like,
+                    },
+                    discoveredBy: updatedCraft.discoveredBy,
+                    Like: updatedCraft.Like,
                 }
             }
             // console.log(Craft)
@@ -210,38 +210,49 @@ async function run() {
             res.send(cursor)
         })
 
-        // //---------------------------Get apply by ID-----------------------
-        // app.get('/apply/:id', async (req, res) => {
-        //     const id = req.params.id
-        //     //  console.log(id)
-        //     const query = { _id: new ObjectId(id) }
-        //     const result = await LikedCollection.findOne(query)
-        //     res.send(result)
-        // })
+        //---------------------------Get like by ID-----------------------
+        app.get('/liked/:id', async (req, res) => {
+            const id = req.params.id
+            console.log(id)
+            const query = { likeId: id }
+            const result = await LikedCollection.findOne(query)
+            res.send(result)
+        })
 
-        // //---------------------------Get apply by ID to show users-----------------------
-        // app.get('/apply/applicant/:job_id', async (req, res) => {
-        //     const id = req.params.job_id
-        //     //  console.log(id)
-        //     const query = { job_id: id }
-        //     const result = await LikedCollection.find(query).toArray()
-        //     res.send(result)
-        // })
+        //--------------------------------delete like---------------------------
+        app.delete('/liked/:id', async (req, res) => {
+            const id = req.params.id
+            //  console.log(id)
+            const cursor = { likeId: id }
+            const result = await LikedCollection.deleteOne(cursor)
 
-        // //---------------------------Get apply by ID-----------------------
-        // app.patch('/apply/:id', async (req, res) => {
-        //     const id = req.params.id
-        //     const data = req.body.status
-        //     //  console.log(id)
-        //     const query = { _id: new ObjectId(id) }
-        //     const updatedDoc = {
-        //         $set: {
-        //             status: data
-        //         }
-        //     }
-        //     const result = await LikedCollection.updateOne(query, updatedDoc)
-        //     res.send(result)
-        // })
+            const query = { _id: new ObjectId(id) }
+            const likee = await HistoCollection.findOne(query)
+
+            // console.log(newLiked)
+            // console.log(query)
+            // console.log(likee)
+
+            if (likee.Like > 1) {
+                likeCount = likee.Like - 1
+            }
+            else {
+                likeCount = 0
+            }
+
+            //---updating the like count
+            const filter = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    Like: likeCount
+                }
+            }
+
+            const updatedResult = await HistoCollection.updateOne(filter, updatedDoc)
+
+            res.send(result)
+        })
+
 
 
 
