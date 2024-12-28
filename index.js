@@ -57,7 +57,7 @@ async function run() {
 
         // ---------------creating DATA BASE ON MONGO DB----------------------
         const HistoCollection = client.db("CraftDB").collection('All-Crafts')
-        const LikedCollection = client.db("LikedDB").collection('All-Liked')
+        const LikedCollection = client.db("CraftDB").collection('All-Liked')
 
         // ---auth related Apis-------------------------------
         app.post('/jwt', async (req, res) => {
@@ -66,8 +66,9 @@ async function run() {
             res
                 .cookie('token', token, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict"
+                    secure: false,
+                    // secure: process.env.NODE_ENV === 'production',
+                    // sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict"
                 })
                 // .send(token)
                 .send({ success: true })
@@ -76,8 +77,9 @@ async function run() {
         app.post('/logout', (req, res) => {
             res.clearCookie('token', {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict"
+                secure: false,
+                // secure: process.env.NODE_ENV === 'production',
+                // sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict"
             }).send({ tokenRemoved: true })
         })
 
@@ -122,15 +124,17 @@ async function run() {
             const result = await LikedCollection.insertOne(newLiked)
 
             //-not the best way to get the application count
-            const id = newLiked.job_id
+            const id = newLiked.data._id
             const query = { _id: new ObjectId(id) }
             const likee = await HistoCollection.findOne(query)
 
-            console.log(job)
+            // console.log(newLiked)
+            // console.log(query)
+            // console.log(likee)
 
             let likeCount = 0
 
-            if (likee.applyCount) {
+            if (likee.Like) {
                 likeCount = likee.Like + 1
             }
             else {
@@ -152,23 +156,23 @@ async function run() {
         })
 
 
-        // //---------------------------Showing all Apply------------------------
-        // app.get('/apply', tokenVerify, async (req, res) => {
-        //     const QEmail = req.query.email
-        //     const query = { email: QEmail }
+        //---------------------------Showing all Apply------------------------
+        app.get('/liked', tokenVerify, async (req, res) => {
+            const QEmail = req.query.email
+            const query = { email: QEmail }
 
-        //     // console.log(QEmail)
-        //     // console.log(req.user.email)
+            console.log(QEmail)
+            console.log(req.user.email)
 
-        //     if (req.user.email !== req.query.email) {
-        //         return res.status(403).send({ massage: "forbidden" })
-        //     }
+            if (req.user.email !== req.query.email) {
+                return res.status(403).send({ massage: "forbidden" })
+            }
 
-        //     const cursor = await LikedCollection.find(query).toArray()
-        //     // const result = cursor
-        //     // console.log(cursor)
-        //     res.send(cursor)
-        // })
+            const cursor = await LikedCollection.find(query).toArray()
+            // const result = cursor
+            // console.log(cursor)
+            res.send(cursor)
+        })
 
         // //---------------------------Get apply by ID-----------------------
         // app.get('/apply/:id', async (req, res) => {
