@@ -17,14 +17,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 // // ------------------------------------------
-const logger = (req, res, next) => {
-    console.log('inside the logger')
-    next()
-}
+
 
 const tokenVerify = (req, res, next) => {
     const token = req?.cookies?.token
-    console.log('inside the tokenVerify part', token)
+    // console.log('inside the tokenVerify part', token)
 
     if (!token) {
         return res.status(401).send({ massage: "Unauthorized access" })
@@ -109,7 +106,48 @@ async function run() {
             res.send(result)
         })
 
+        //--------------------------------delete craft---------------------------
+        app.delete('/allCraft/:id', async (req, res) => {
+            const id = req.params.id
+            //  console.log(id)
+            const cursor = { _id: new ObjectId(id) }
+            const result = await HistoCollection.deleteOne(cursor)
+            res.send(result)
+        })
 
+
+        //----------------------- update craft---------------------------------
+        app.put('/allCraft/:id', async (req, res) => {
+            const id = req.params.id
+            //  console.log(id)
+            const query = { _id: new ObjectId(id) }
+            const option = { upsert: true }
+            const updatedCraft = req.body
+
+            // console.log(updatedCraft)
+
+            const Craft = {
+                $set: {
+                    artifactName: updatedCraft.artifactName,
+                    artifactImage: updatedCraft.artifactImage,
+                    artifactType: updatedCraft.artifactType,
+                    historicalContext: updatedCraft.historicalContext,
+                    createdAt: updatedCraft.createdAt,
+                    discoveredAt: updatedCraft.discoveredAt,
+                    presentLocation: updatedCraft.presentLocation,
+                    adderInfo: {
+                        name: updatedCraft.adderInfo.name,
+                        email: updatedCraft.adderInfo.email
+                      },
+                      discoveredBy: updatedCraft.discoveredBy,
+                      Like: updatedCraft.Like,
+                }
+            }
+            // console.log(Craft)
+
+            const result = await HistoCollection.updateOne(query, Craft, option)
+            res.send(result)
+        })
 
 
         //-------------------------------------------------------------------------------------------------------
@@ -156,13 +194,13 @@ async function run() {
         })
 
 
-        //---------------------------Showing all Apply------------------------
+        //---------------------------Showing all like-----------------------
         app.get('/liked', tokenVerify, async (req, res) => {
             const QEmail = req.query.email
             const query = { email: QEmail }
 
-            console.log(QEmail)
-            console.log(req.user.email)
+            // console.log(QEmail)
+            // console.log(req.user.email)
 
             if (req.user.email !== req.query.email) {
                 return res.status(403).send({ massage: "forbidden" })
