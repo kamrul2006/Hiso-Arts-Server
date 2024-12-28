@@ -115,7 +115,6 @@ async function run() {
             res.send(result)
         })
 
-
         //----------------------- update craft---------------------------------
         app.put('/allCraft/:id', async (req, res) => {
             const id = req.params.id
@@ -123,7 +122,6 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const option = { upsert: true }
             const updatedCraft = req.body
-
             // console.log(updatedCraft)
 
             const Craft = {
