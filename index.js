@@ -10,7 +10,10 @@ const port = process.env.PORT || 5000
 
 // --------------------middle ware-------------------------
 app.use(cors({
-    origin: ['http://localhost:5173',],
+    origin: ['http://localhost:5173',
+        'https://k-histocraft.web.app',
+        'https://k-histocraft.firebaseapp.com'
+    ],
     credentials: true
 }))
 app.use(express.json());
@@ -59,13 +62,13 @@ async function run() {
         // ---auth related Apis-------------------------------
         app.post('/jwt', async (req, res) => {
             const user = req.body
-            const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' })
+            const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '10h' })
             res
                 .cookie('token', token, {
                     httpOnly: true,
-                    secure: false,
-                    // secure: process.env.NODE_ENV === 'production',
-                    // sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict"
+                    // secure: false,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict"
                 })
                 // .send(token)
                 .send({ success: true })
@@ -74,9 +77,9 @@ async function run() {
         app.post('/logout', (req, res) => {
             res.clearCookie('token', {
                 httpOnly: true,
-                secure: false,
-                // secure: process.env.NODE_ENV === 'production',
-                // sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict"
+                // secure: false,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? "none" : "strict"
             }).send({ tokenRemoved: true })
         })
 
@@ -91,7 +94,7 @@ async function run() {
                      option = { artifactName: { $regex: Search, $options: "i" } }
                  }
 
-            const cursor = HistoCollection.find(option)
+            const cursor = HistoCollection.find(option).sort( { Like : -1 } )
             const result = await cursor.toArray()
             res.send(result)
         })
@@ -219,7 +222,7 @@ async function run() {
         //---------------------------Get like by ID-----------------------
         app.get('/liked/:id', async (req, res) => {
             const id = req.params.id
-            console.log(id)
+            // console.log(id)
             const query = { likeId: id }
             const result = await LikedCollection.findOne(query)
             res.send(result)
