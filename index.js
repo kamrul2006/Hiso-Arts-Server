@@ -83,8 +83,15 @@ async function run() {
 
         //---------------------------Showing all craft------------------------
         app.get('/allCraft', async (req, res) => {
-            // console.log('inside all jobs')
-            const cursor = HistoCollection.find()
+
+                 //------------------------------Search here---------------------------
+                 const { Search } = req.query;
+                 let option = {}
+                 if (Search) {
+                     option = { artifactName: { $regex: Search, $options: "i" } }
+                 }
+
+            const cursor = HistoCollection.find(option)
             const result = await cursor.toArray()
             res.send(result)
         })
@@ -188,7 +195,6 @@ async function run() {
             const updatedResult = await HistoCollection.updateOne(filter, updatedDoc)
 
             res.send(result)
-
         })
 
 
@@ -253,12 +259,8 @@ async function run() {
             res.send(result)
         })
 
-
-
-
-
         // await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
 
     }
