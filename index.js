@@ -21,7 +21,6 @@ app.use(cookieParser());
 
 // // ------------------------------------------
 
-
 const tokenVerify = (req, res, next) => {
     const token = req?.cookies?.token
     // console.log('inside the tokenVerify part', token)
@@ -87,14 +86,14 @@ async function run() {
         //---------------------------Showing all craft------------------------
         app.get('/allCraft', async (req, res) => {
 
-                 //------------------------------Search here---------------------------
-                 const { Search } = req.query;
-                 let option = {}
-                 if (Search) {
-                     option = { artifactName: { $regex: Search, $options: "i" } }
-                 }
+            //------------------------------Search here---------------------------
+            const { Search } = req.query;
+            let option = {}
+            if (Search) {
+                option = { artifactName: { $regex: Search, $options: "i" } }
+            }
 
-            const cursor = HistoCollection.find(option).sort( { Like : -1 } )
+            const cursor = HistoCollection.find(option).sort({ Like: -1 })
             const result = await cursor.toArray()
             res.send(result)
         })
